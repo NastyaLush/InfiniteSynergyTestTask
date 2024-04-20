@@ -3,13 +3,13 @@ package test.laba.server.service.auth;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import test.laba.server.repository.AuthRepository;
 import test.laba.server.dto.AuthenticationRequest;
 import test.laba.server.dto.AuthenticationResponse;
 import test.laba.server.dto.RegisterRequest;
 import test.laba.server.entity.Token;
-import test.laba.server.repository.TokenRepository;
 import test.laba.server.entity.User;
+import test.laba.server.repository.AuthRepository;
+import test.laba.server.repository.TokenRepository;
 import test.laba.server.repository.UserRepository;
 import test.laba.server.util.PasswordHandler;
 
@@ -22,27 +22,24 @@ public class AuthenticationService {
     private final AuthRepository authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        try {
-            var user = User.builder()
-                           .email(request.email())
-                           .password(PasswordHandler.encryptPass(request.password()))
-                           .tokens(List.of())
-                           .amount(1000L)
-                           .build();
-            var savedUser = repository.save(user);
-            var jwtToken = jwtService.generateToken(user);
-            saveUserToken(savedUser, jwtToken);
-            return AuthenticationResponse.builder()
-                                         .accessToken(jwtToken)
-                                         .build();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
-        }
+
+        var user = User.builder()
+                       .email(request.email())
+                       .password(PasswordHandler.encryptPass(request.password()))
+                       .tokens(List.of())
+                       .amount(1000L)
+                       .build();
+        var savedUser = repository.save(user);
+        var jwtToken = jwtService.generateToken(user);
+        saveUserToken(savedUser, jwtToken);
+        return AuthenticationResponse.builder()
+                                     .accessToken(jwtToken)
+                                     .build();
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authentificate(
+        authenticationManager.authenticate(
                 request.email(),
                 PasswordHandler.encryptPass(request.password())
         );
@@ -57,7 +54,7 @@ public class AuthenticationService {
     }
 
     public boolean authenticate(String email) {
-        return authenticationManager.authentificate(
+        return authenticationManager.authenticate(
                 email
         );
     }

@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthRepository {
     private final UserRepository userRepository;
 
-    public void authentificate(String username, String password) {
+    public void authenticate(String username, String password) {
         userRepository.findByEmail(username)
                       .ifPresent(user -> {
                           if (!user.getPassword()
@@ -16,7 +16,7 @@ public class AuthRepository {
                       });
     }
 
-    public boolean authentificate(String username) {
+    public boolean authenticate(String username) {
         return userRepository.findByEmail(username)
                              .isPresent();
     }
